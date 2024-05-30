@@ -1,7 +1,7 @@
 import 'package:belajar/helpers/api_url.dart';
 import 'package:belajar/model/aksesoris.dart';
 import 'package:flutter/material.dart';
-import 'form_penyewaan.dart';
+import 'form_accessories.dart';
 import 'Api/accessories.dart';
 
 class AccesoriesPage extends StatefulWidget {
@@ -54,6 +54,16 @@ class _AccesoriesPageState extends State<AccesoriesPage> {
               borderRadius: BorderRadius.circular(10),
             ),
             child: TextField(
+              onChanged: (value) {
+                setState(() {
+                  filteredAccessories = accessories
+                      .where((acc) => acc.namaAlat
+                          .toString()
+                          .toLowerCase()
+                          .contains(value.toLowerCase()))
+                      .toList();
+                });
+              },
               controller: _searchController,
               decoration: InputDecoration(
                 hintText: "Accessories",
@@ -66,7 +76,7 @@ class _AccesoriesPageState extends State<AccesoriesPage> {
         ),
         body: Container(
           decoration: BoxDecoration(
-            color: Color(0xfff5dfdf),
+            color: Color.fromARGB(255, 246, 238, 238),
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(15),
               topRight: Radius.circular(15),
@@ -78,7 +88,7 @@ class _AccesoriesPageState extends State<AccesoriesPage> {
               crossAxisSpacing: 10,
               mainAxisSpacing: 10,
             ),
-            itemCount: accessories.length,
+            itemCount: filteredAccessories.length,
             itemBuilder: (BuildContext context, int index) {
               return GestureDetector(
                 onTap: () {
@@ -86,13 +96,13 @@ class _AccesoriesPageState extends State<AccesoriesPage> {
                     context,
                     MaterialPageRoute(
                       builder: (context) => AccessoriesDetailWidget(
-                        accessoriesDetails: accessories[index],
+                        accessoriesDetails: filteredAccessories[index],
                       ),
                     ),
                   );
                 },
                 child: AccessoriesItem(
-                  accessories: accessories[index],
+                  accessories: filteredAccessories[index],
                 ),
               );
             },
@@ -110,50 +120,92 @@ class AccessoriesItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(accessories.namaAlat);
     return Container(
-      padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Color(0xff000000)),
         color: Colors.white,
       ),
-      child: Stack(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          Center(
+            child: Image.network(
+              '${ApiUrl.localhost}images/' +
+                  (accessories.gambar?.toString() ?? ''),
+              width: 50,
+              height: 50,
+              fit: BoxFit.cover,
+            ),
+          ),
+          SizedBox(height: 4),
+          Center(
+            child: Text(
+              accessories.namaAlat ?? '',
+              style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+            ),
+          ),
+          SizedBox(height: 4),
+          Center(
+            child: Text('6 Jam: ${accessories.harga6}',
+                style: TextStyle(
+                    fontSize: 12, color: Color.fromARGB(255, 13, 47, 75))),
+          ),
+          Center(
+            child: Text('12 Jam: ${accessories.harga12}',
+                style: TextStyle(
+                    fontSize: 12, color: Color.fromARGB(255, 8, 63, 9))),
+          ),
+          Center(
+            child: Text('24 Jam: ${accessories.harga24}',
+                style: TextStyle(
+                    fontSize: 12, color: Color.fromARGB(255, 65, 43, 11))),
+          ),
+          SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Image.network(
-                '${ApiUrl.localhost}images/' + accessories.gambar.toString() ??
-                    '',
-                width: 50,
-                height: 50,
-                fit: BoxFit.cover,
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AccessoriesDetailWidget(
+                          accessoriesDetails: accessories),
+                    ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                    primary: Colors.grey.shade400,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    )),
+                child: Text(
+                  'Detail',
+                  style: TextStyle(
+                    color: Colors.white,
+                  ),
+                ),
               ),
-              SizedBox(height: 4),
-              Text(
-                accessories.namaAlat!,
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+              SizedBox(
+                width: 8,
               ),
-              SizedBox(height: 4),
-              Text(
-                accessories.deskripsi ?? '',
-                style: TextStyle(fontSize: 12),
-              ),
-              Text(
-                accessories.harga6.toString() ?? '',
-                style: TextStyle(fontSize: 12),
-              ),
-              Text(
-                accessories.harga12.toString() ?? '',
-                style: TextStyle(fontSize: 12),
-              ),
-              Text(
-                accessories.harga24.toString() ?? '',
-                style: TextStyle(fontSize: 12),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade400,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  'Tersedia 1',
+                  style: TextStyle(
+                    color: Colors.white,
+                  ),
+                ),
               ),
             ],
-          ),
+          )
         ],
       ),
     );
@@ -175,7 +227,7 @@ class AccessoriesDetailWidget extends StatelessWidget {
             Navigator.pop(context);
           },
         ),
-        title: Text(accessoriesDetails.namaAlat!),
+        title: Text(accessoriesDetails.namaAlat ?? ''),
         backgroundColor: Color(0xff000000),
       ),
       body: Padding(
@@ -187,35 +239,17 @@ class AccessoriesDetailWidget extends StatelessWidget {
               height: MediaQuery.of(context).size.height * 0.4,
               child: Image.network(
                 '${ApiUrl.localhost}images/' +
-                        accessoriesDetails.gambar.toString() ??
-                    '',
+                    (accessoriesDetails.gambar?.toString() ?? ''),
                 width: MediaQuery.of(context).size.width,
                 fit: BoxFit.cover,
               ),
             ),
             SizedBox(height: 16),
-            Text(accessoriesDetails.deskripsi ?? ''),
-            SizedBox(height: 16),
-            Text(
-              "Completeness:",
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-            ),
+            Text('6 Jam: ${accessoriesDetails.harga6}'),
             SizedBox(height: 8),
-            Text(
-              "${accessoriesDetails.harga6} :",
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-            ),
+            Text('12 Jam: ${accessoriesDetails.harga12}'),
             SizedBox(height: 8),
-            Text(
-              "${accessoriesDetails.harga12} ",
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 8),
-            Text(
-              "${accessoriesDetails.harga24} ",
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 8),
+            Text('24 Jam: ${accessoriesDetails.harga24}'),
           ],
         ),
       ),
@@ -223,11 +257,11 @@ class AccessoriesDetailWidget extends StatelessWidget {
         padding: const EdgeInsets.all(8.0),
         child: FloatingActionButton.extended(
           onPressed: () {
-            // Navigasi ke halaman FormPage
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => PersonalForm(),
+                builder: (context) =>
+                    FormAksesoris(aksesoris: accessoriesDetails),
               ),
             );
           },
@@ -237,7 +271,7 @@ class AccessoriesDetailWidget extends StatelessWidget {
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      backgroundColor: Color(0xfffff4f4),
+      backgroundColor: Color.fromARGB(255, 248, 232, 232),
     );
   }
 }

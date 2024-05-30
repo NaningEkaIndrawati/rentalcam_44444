@@ -15,19 +15,22 @@ class OnboardModel {
 
 final List<OnboardModel> onboard_data = [
   OnboardModel(
-    image: "images/onboard1.png",
-    title: "Relaxing Trip",
-    description: "our drivers prioritize comfort\nand safety on the way.",
+    image: "images/kamera.jpeg",
+    title: "Rumah Rental Camera",
+    description:
+        "Raih pengalaman fotografi tanpa batas dengan perentalan kamera kami!",
   ),
   OnboardModel(
-    image: "images/onboard2.png",
-    title: "Relaxing Trip",
-    description: "our drivers prioritize comfort\nand safety on the way.",
+    image: "images/lensa2.jpeg",
+    title: "Rumah Rental Camera",
+    description:
+        "Tingkatkan kreativitas fotografi Anda dengan koleksi kamera terbaik kami!",
   ),
   OnboardModel(
-    image: "images/onboard3.png",
-    title: "Relaxing Trip",
-    description: "our drivers prioritize comfort\nand safety on the way.",
+    image: "images/aksesoris.jpeg",
+    title: "Rumah Rental Camera",
+    description:
+        "Abadikan momen berharga Anda dengan kualitas gambar yang luar biasa! Sewa kamera kami sekarang!",
   ),
 ];
 
@@ -69,7 +72,7 @@ class OnboardingContent extends StatelessWidget {
                 description,
                 textAlign: TextAlign.center,
                 style: const TextStyle(
-                  color: Colors.grey,
+                  color: Color.fromARGB(255, 99, 98, 98),
                   fontSize: 16,
                   fontWeight: FontWeight.w400,
                 ),
@@ -129,19 +132,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       size: 24,
                     ),
                   ),
-                  TextButton(
-                    onPressed: () {
-                      // Handle skipping onboarding
-                    },
-                    child: const Text(
-                      "Skip",
-                      style: TextStyle(
-                        color: Colors.orange,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                  ),
+                  // TextButton(
+                  //   onPressed: () {
+                  //     // Handle skipping onboarding
+                  //   },
+                  //   child: const Text(
+                  //     "Skip",
+                  //     style: TextStyle(
+                  //       color: Colors.orange,
+                  //       fontSize: 14,
+                  //       fontWeight: FontWeight.w400,
+                  //     ),
+                  //   ),
+                  // ),
                 ],
               ),
             ),
@@ -202,7 +205,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   height: 60,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(50),
-                    color: Colors.red,
+                    color: Color.fromARGB(255, 157, 42, 34),
                   ),
                   child: Center(
                     child: Text(

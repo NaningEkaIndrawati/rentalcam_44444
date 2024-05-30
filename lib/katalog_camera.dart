@@ -2,7 +2,7 @@ import 'package:belajar/Api/kamera.dart';
 import 'package:belajar/helpers/api_url.dart';
 import 'package:belajar/model/camera.dart';
 import 'package:flutter/material.dart';
-import 'form_penyewaan.dart';
+import 'form_camera.dart';
 
 class CameraPage extends StatefulWidget {
   @override
@@ -35,6 +35,7 @@ class _CameraPageState extends State<CameraPage> {
 
   @override
   Widget build(BuildContext context) {
+    print(filteredCameras);
     // print(cameras);
     return MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -54,6 +55,16 @@ class _CameraPageState extends State<CameraPage> {
               borderRadius: BorderRadius.circular(10),
             ),
             child: TextField(
+              onChanged: (value) {
+                setState(() {
+                  filteredCameras = cameras
+                      .where((camera) => camera.namaAlat
+                          .toString()
+                          .toLowerCase()
+                          .contains(value.toLowerCase()))
+                      .toList();
+                });
+              },
               controller: _searchController,
               decoration: InputDecoration(
                 hintText: "Canon 650D",
@@ -66,7 +77,7 @@ class _CameraPageState extends State<CameraPage> {
         ),
         body: Container(
           decoration: BoxDecoration(
-            color: Color(0xfff5dfdf),
+            color: Color.fromARGB(255, 248, 232, 232),
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(15),
               topRight: Radius.circular(15),
@@ -78,19 +89,19 @@ class _CameraPageState extends State<CameraPage> {
               crossAxisSpacing: 10,
               mainAxisSpacing: 10,
             ),
-            itemCount: cameras.length,
+            itemCount: filteredCameras.length,
             itemBuilder: (BuildContext context, int index) {
               return GestureDetector(
                 onTap: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) =>
-                          CameraDetailsWidget(cameraDetails: cameras[index]),
+                      builder: (context) => CameraDetailsWidget(
+                          cameraDetails: filteredCameras[index]),
                     ),
                   );
                 },
-                child: CameraItem(camera: cameras[index]),
+                child: CameraItem(camera: filteredCameras[index]),
               );
             },
           ),
@@ -106,47 +117,93 @@ class CameraItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('LINK:::  ${ApiUrl.localhost}images/' + camera!.gambar.toString());
     return Container(
-      padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Color(0xff000000)),
         color: Colors.white,
       ),
-      child: Stack(
+      child: Column(
+        mainAxisAlignment:
+            MainAxisAlignment.center, // Center content vertically
+        crossAxisAlignment:
+            CrossAxisAlignment.center, // Center content horizontally
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          Center(
+            child: Image.network(
+              '${ApiUrl.localhost}images/' + camera!.gambar.toString(),
+              width: 50,
+              height: 50,
+              fit: BoxFit.cover,
+            ),
+          ),
+          SizedBox(height: 4),
+          Center(
+            child: Text(
+              camera.namaAlat,
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+          ),
+          SizedBox(height: 4),
+          Center(
+            child: Text('6 Jam: ${camera.harga6}',
+                style: TextStyle(
+                    fontSize: 12, color: Color.fromARGB(255, 13, 47, 75))),
+          ),
+          Center(
+            child: Text('12 Jam: ${camera.harga12}',
+                style: TextStyle(
+                    fontSize: 12, color: Color.fromARGB(255, 8, 63, 9))),
+          ),
+          Center(
+            child: Text('24 Jam: ${camera.harga24}',
+                style: TextStyle(
+                    fontSize: 12, color: Color.fromARGB(255, 65, 43, 11))),
+          ),
+          SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Image.network(
-                '${ApiUrl.localhost}images/' + camera!.gambar.toString(),
-                width: 50,
-                height: 50,
-                fit: BoxFit.cover,
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          CameraDetailsWidget(cameraDetails: camera),
+                    ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                    primary: Colors.grey.shade400,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    )),
+                child: Text(
+                  'Detail',
+                  style: TextStyle(
+                    color: Colors.white,
+                  ),
+                ),
               ),
-              SizedBox(height: 4),
-              Text(
-                camera.namaAlat,
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+              SizedBox(
+                width: 8,
               ),
-              SizedBox(height: 4),
-              Text(
-                camera.harga6.toString(),
-                style: TextStyle(fontSize: 12),
-              ),
-              SizedBox(height: 4),
-              Text(
-                camera.harga12.toString(),
-                style: TextStyle(fontSize: 12),
-              ),
-              SizedBox(height: 4),
-              Text(
-                camera.harga24.toString(),
-                style: TextStyle(fontSize: 12),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade400,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  'Tersedia 1',
+                  style: TextStyle(
+                    color: Colors.white,
+                  ),
+                ),
               ),
             ],
-          ),
+          )
         ],
       ),
     );
@@ -168,7 +225,7 @@ class CameraDetailsWidget extends StatelessWidget {
             Navigator.pop(context);
           },
         ),
-        title: Text(cameraDetails.namaAlat),
+        title: Text(cameraDetails.namaAlat ?? ''),
         backgroundColor: Color(0xff000000),
       ),
       body: Padding(
@@ -179,20 +236,24 @@ class CameraDetailsWidget extends StatelessWidget {
             Container(
               height: MediaQuery.of(context).size.height * 0.4,
               child: Image.network(
-                '${ApiUrl.localhost}images/' + cameraDetails.gambar.toString(),
+                '${ApiUrl.localhost}images/' +
+                    (cameraDetails.gambar?.toString() ?? ''),
                 width: MediaQuery.of(context).size.width,
                 fit: BoxFit.cover,
               ),
             ),
             SizedBox(height: 16),
-            Text(cameraDetails.harga6),
+            Text('Deskripsi : '),
             SizedBox(height: 16),
-            Text(
-              "Completeness:",
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-            ),
+            Text(cameraDetails.deskripsi ?? 'Tidak Ada Deskripsi'),
+            SizedBox(height: 16),
+            Text('Harga : '),
+            SizedBox(height: 16),
+            Text('6 Jam: ${cameraDetails.harga6}'),
             SizedBox(height: 8),
-            Text(cameraDetails.harga24),
+            Text('12 Jam: ${cameraDetails.harga12}'),
+            SizedBox(height: 8),
+            Text('24 Jam: ${cameraDetails.harga24}'),
           ],
         ),
       ),
@@ -200,11 +261,10 @@ class CameraDetailsWidget extends StatelessWidget {
         padding: const EdgeInsets.all(8.0),
         child: FloatingActionButton.extended(
           onPressed: () {
-            // Navigasi ke halaman FormPage
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => PersonalForm(),
+                builder: (context) => FormCamera(kamera: cameraDetails),
               ),
             );
           },
@@ -213,9 +273,8 @@ class CameraDetailsWidget extends StatelessWidget {
           backgroundColor: Color(0xff000000),
         ),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation
-          .endFloat, // Change to endFloat for bottom right corner
-      backgroundColor: Color(0xfffff4f4), // Set your desired background color
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      backgroundColor: Color.fromARGB(255, 248, 232, 232),
     );
   }
 }

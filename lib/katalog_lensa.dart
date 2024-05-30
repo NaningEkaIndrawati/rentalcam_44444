@@ -1,8 +1,9 @@
 import 'package:belajar/Api/lensa.dart';
+import 'package:belajar/form_lensa.dart';
 import 'package:belajar/helpers/api_url.dart';
 import 'package:belajar/model/lensa.dart';
 import 'package:flutter/material.dart';
-import 'form_penyewaan.dart';
+import 'form_camera.dart';
 
 class LensaPage extends StatefulWidget {
   @override
@@ -52,6 +53,16 @@ class _LensaPageState extends State<LensaPage> {
               borderRadius: BorderRadius.circular(10),
             ),
             child: TextField(
+              onChanged: (value) {
+                setState(() {
+                  filteredLensas = lensas
+                      .where((lensa) => lensa.namaAlat
+                          .toString()
+                          .toLowerCase()
+                          .contains(value.toLowerCase()))
+                      .toList();
+                });
+              },
               controller: _searchController,
               decoration: InputDecoration(
                 hintText: "Canon 650D",
@@ -64,7 +75,7 @@ class _LensaPageState extends State<LensaPage> {
         ),
         body: Container(
           decoration: BoxDecoration(
-            color: Color(0xfff5dfdf),
+            color: Color.fromARGB(255, 248, 232, 232),
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(15),
               topRight: Radius.circular(15),
@@ -76,19 +87,19 @@ class _LensaPageState extends State<LensaPage> {
               crossAxisSpacing: 10,
               mainAxisSpacing: 10,
             ),
-            itemCount: lensas.length,
+            itemCount: filteredLensas.length,
             itemBuilder: (BuildContext context, int index) {
               return GestureDetector(
                 onTap: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) =>
-                          LensaDetailsWidget(lensaDetails: lensas[index]),
+                      builder: (context) => LensaDetailsWidget(
+                          lensaDetails: filteredLensas[index]),
                     ),
                   );
                 },
-                child: LensaItem(lensa: lensas[index]),
+                child: LensaItem(lensa: filteredLensas[index]),
               );
             },
           ),
@@ -105,45 +116,90 @@ class LensaItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Color(0xff000000)),
         color: Colors.white,
       ),
-      child: Stack(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          Center(
+            child: Image.network(
+              '${ApiUrl.localhost}images/' + lensa.gambar.toString(),
+              width: 50,
+              height: 50,
+              fit: BoxFit.cover,
+            ),
+          ),
+          SizedBox(height: 4),
+          Center(
+            child: Text(
+              lensa.namaAlat ?? "",
+              style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+            ),
+          ),
+          SizedBox(height: 4),
+          Center(
+            child: Text('6 Jam: ${lensa.harga6?.toString() ?? ""}',
+                style: TextStyle(
+                    fontSize: 12, color: Color.fromARGB(255, 13, 47, 75))),
+          ),
+          Center(
+            child: Text('12 Jam: ${lensa.harga12?.toString() ?? ""}',
+                style: TextStyle(
+                    fontSize: 12, color: Color.fromARGB(255, 8, 63, 9))),
+          ),
+          Center(
+            child: Text('24 Jam: ${lensa.harga24?.toString() ?? ""}',
+                style: TextStyle(
+                    fontSize: 12, color: Color.fromARGB(255, 65, 43, 11))),
+          ),
+          SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Image.network(
-                '${ApiUrl.localhost}images/' + lensa.gambar.toString(),
-                width: 50,
-                height: 50,
-                fit: BoxFit.cover,
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          LensaDetailsWidget(lensaDetails: lensa),
+                    ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                    primary: Colors.grey.shade400,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    )),
+                child: Text(
+                  'Detail',
+                  style: TextStyle(
+                    color: Colors.white,
+                  ),
+                ),
               ),
-              SizedBox(height: 4),
-              Text(
-                lensa.namaAlat ?? "",
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+              SizedBox(
+                width: 8,
               ),
-              SizedBox(height: 4),
-              Text(
-                lensa.harga6?.toString() ?? "",
-                style: TextStyle(fontSize: 12),
-              ),
-              SizedBox(height: 4),
-              Text(
-                lensa.harga12?.toString() ?? "",
-                style: TextStyle(fontSize: 12),
-              ),
-              SizedBox(height: 4),
-              Text(
-                lensa.harga24?.toString() ?? "",
-                style: TextStyle(fontSize: 12),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade400,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  'Tersedia 1',
+                  style: TextStyle(
+                    color: Colors.white,
+                  ),
+                ),
               ),
             ],
-          ),
+          )
         ],
       ),
     );
@@ -152,6 +208,7 @@ class LensaItem extends StatelessWidget {
 
 class LensaDetailsWidget extends StatelessWidget {
   final Data lensaDetails;
+
   LensaDetailsWidget({required this.lensaDetails});
 
   @override
@@ -181,14 +238,11 @@ class LensaDetailsWidget extends StatelessWidget {
               ),
             ),
             SizedBox(height: 16),
-            Text(lensaDetails.harga6?.toString() ?? ""),
-            SizedBox(height: 16),
-            Text(
-              "Completeness:",
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-            ),
+            Text('6 Jam: ${lensaDetails.harga6?.toString() ?? ""}'),
             SizedBox(height: 8),
-            Text(lensaDetails.harga24?.toString() ?? ""),
+            Text('12 Jam: ${lensaDetails.harga12?.toString() ?? ""}'),
+            SizedBox(height: 8),
+            Text('24 Jam: ${lensaDetails.harga24?.toString() ?? ""}'),
           ],
         ),
       ),
@@ -199,7 +253,7 @@ class LensaDetailsWidget extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => PersonalForm(),
+                builder: (context) => FormLensa(lensa: lensaDetails),
               ),
             );
           },
@@ -209,7 +263,7 @@ class LensaDetailsWidget extends StatelessWidget {
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      backgroundColor: Color(0xfffff4f4),
+      backgroundColor: Color.fromARGB(255, 248, 232, 232),
     );
   }
 }

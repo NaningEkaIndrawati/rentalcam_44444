@@ -28,7 +28,7 @@ class LoginPage extends StatelessWidget {
         backgroundColor: Color(0xff000000),
       ),
       body: Container(
-        color: Color(0xfffbebe9),
+        color: Color.fromARGB(255, 248, 232, 232),
         padding: EdgeInsets.all(16.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

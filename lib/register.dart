@@ -43,7 +43,7 @@ class _RegisterPageState extends State<RegisterPage> {
       ),
       body: SingleChildScrollView(
         child: Container(
-          color: Color(0xcdfadcdb),
+          color: Color.fromARGB(255, 248, 232, 232),
           padding: EdgeInsets.all(12.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -116,7 +116,7 @@ class _RegisterPageState extends State<RegisterPage> {
               TextField(
                 controller: noTelephoneController,
                 decoration: InputDecoration(
-                  labelText: 'No Telephone',
+                  labelText: 'No WhatsApp',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12.0),
                   ),
@@ -160,8 +160,15 @@ class _RegisterPageState extends State<RegisterPage> {
                     });
                   }
                 },
-                // ... (style and child properties)
-                child: Text('Choose Image'),
+                style: ElevatedButton.styleFrom(
+                  primary: Colors.grey[300], // Warna latar belakang tombol
+                  onPrimary: Colors.black, // Warna teks tombol
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12.0),
+                  ),
+                ),
+                child:
+                    Text('Choose Image', style: TextStyle(color: Colors.black)),
               ),
 
               SizedBox(height: 12.0),
@@ -206,7 +213,8 @@ class _RegisterPageState extends State<RegisterPage> {
                     "Sudah Punya Akun? Login Disini",
                     style: TextStyle(
                       decoration: TextDecoration.underline,
-                      color: Colors.blue, // You can set your preferred color
+                      color: Color.fromARGB(
+                          255, 13, 13, 13), // You can set your preferred color
                     ),
                   ),
                 ),

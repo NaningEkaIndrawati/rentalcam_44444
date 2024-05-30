@@ -21,12 +21,12 @@ class PersyaratanPage extends StatelessWidget {
     TermsAndConditions(
       title: "Jenis - Jenis Identitas",
       content:
-          "- E-KTP*               - Kartu Pelajar         - Akte Kelahiran\n- SIM                    - KK                       - Ijazah\n- KTM                   - Paspor                  - BPJS",
+          "- E-KTP*            - Kartu Pelajar     - Akte Kelahiran\n- SIM                   - KK                      - Ijazah\n- KTM                 - Paspor              - BPJS",
     ),
     TermsAndConditions(
       title: "Alamat",
       content:
-          "Rumah Rental Camera (RRC)\nJl. Sumber Bening depan Puskesmas Kembiritan\nDemi keamanan barang kami tidak melakukan CO (Cash On Delivery)",
+          "- Rumah Rental Camera (RRC)\n- Jl. Sumber Bening depan Puskesmas Kembiritan\n- Demi keamanan barang kami tidak melakukan CO (Cash On Delivery)",
     ),
     TermsAndConditions(
       title: "Jam Operasional : 06.00 - 22.00",
@@ -58,7 +58,8 @@ class PersyaratanPage extends StatelessWidget {
         ),
         body: Container(
           padding: EdgeInsets.all(16),
-          color: Color(0xfffdebeb), // Ganti warna latar belakang
+          color:
+              Color.fromARGB(255, 250, 238, 238), // Ganti warna latar belakang
           child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

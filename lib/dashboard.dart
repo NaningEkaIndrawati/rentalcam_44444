@@ -1,3 +1,4 @@
+import 'package:belajar/reservasi.dart';
 import 'package:flutter/material.dart';
 import 'katalog_camera.dart';
 import 'katalog_lensa.dart';
@@ -12,21 +13,34 @@ class DashboardPage extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        backgroundColor: Color(
-            0xfff8e5e5), // Add this line to set background color to transparent
+        backgroundColor: Color.fromARGB(255, 248, 232, 232),
         body: Column(
           children: [
             Container(
               alignment: Alignment.topRight,
-              child: IconButton(
-                icon: Icon(Icons.logout),
-                onPressed: () {
-                  // Add your logout functionality here
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => LoginPage()),
-                  );
-                },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.notifications),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => NotifikasiPage()),
+                      );
+                    },
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.logout),
+                    onPressed: () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => LoginPage()),
+                      );
+                    },
+                  ),
+                ],
               ),
             ),
             Expanded(
@@ -37,7 +51,7 @@ class DashboardPage extends StatelessWidget {
                     Container(
                       height: MediaQuery.of(context).size.height * 0.4,
                       child: Image.asset(
-                        'images/rrc.png', // Provide the correct asset path and wrap it with single quotes
+                        'images/rrc.png',
                         width: MediaQuery.of(context).size.width,
                         fit: BoxFit.cover,
                       ),
@@ -60,7 +74,6 @@ class DashboardPage extends StatelessWidget {
                             imageUrl:
                                 'https://id.canon/media/migration/shared/live/products/EN/eos6d-mkii-ef-24-105mm-l.png',
                             onTap: () {
-                              // Navigate to CameraPage when the category is pressed
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -111,7 +124,7 @@ class DashboardPage extends StatelessWidget {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => PackagePage()),
+                                    builder: (context) => PaketPage()),
                               );
                             },
                           ),
@@ -134,7 +147,11 @@ class DashboardPage extends StatelessWidget {
                             imageUrl:
                                 'https://w7.pngwing.com/pngs/789/908/png-transparent-curriculum-vitae-education-information-technology-research-technology-electronics-resume-logo-thumbnail.png',
                             onTap: () {
-                              // Add your onTap functionality for the Riwayat category
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => Second()),
+                              );
                             },
                           ),
                         ],
@@ -147,150 +164,179 @@ class DashboardPage extends StatelessWidget {
             ),
             Container(
               color: Color(0xff000000),
-              padding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
+              width: MediaQuery.of(context).size.width,
+              padding: EdgeInsets.all(5),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Row(
-                        children: [
-                          Image.asset(
-                            'images/wa.png',
-                            height: 20,
-                            width: 20,
-                          ),
-                          SizedBox(width: 5),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                '+62 813-3605-9335',
+                      Container(
+                        width: MediaQuery.of(context).size.width * 0.2,
+                        child: Row(
+                          children: [
+                            Image.asset(
+                              'images/wa.png',
+                              height: 18,
+                              width: 18,
+                            ),
+                            SizedBox(width: 10),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "08171009199",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 8,
+                                    ),
+                                  ),
+                                  Text(
+                                    "08173232321",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 8,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        width: MediaQuery.of(context).size.width * 0.5,
+                        child: Row(
+                          children: [
+                            Image.asset(
+                              'images/yt.png',
+                              height: 18,
+                              width: 18,
+                            ),
+                            SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                "RRC",
                                 style: TextStyle(
                                   color: Colors.white,
-                                  fontSize: 5,
-                                  fontWeight: FontWeight.bold,
+                                  fontSize: 10,
                                 ),
                               ),
-                              Text(
-                                '+62 882-2821-9149',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 5,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 10),
-                      Row(
-                        children: [
-                          Icon(Icons.email, size: 20),
-                          SizedBox(width: 5),
-                          Text(
-                            'rumahrentalcamera4444@gmail.com',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 5,
-                              fontWeight: FontWeight.bold,
                             ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 10),
-                      Row(
-                        children: [
-                          Image.asset(
-                            'images/location.png',
-                            height: 20,
-                            width: 20,
-                          ),
-                          SizedBox(width: 5),
-                          Text(
-                            'Jl. Sumber Bening depan Genteng Puskesmas Kembiritan',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 5,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ],
                   ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
+                  SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Row(
-                        children: [
-                          Image.asset(
-                            'images/yt.png',
-                            height: 20,
-                            width: 20,
-                          ),
-                          SizedBox(width: 5),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'RRC POTRET',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 5,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                      Container(
+                        width: MediaQuery.of(context).size.width * 0.4,
+                        child: Row(
+                          children: [
+                            Image.asset(
+                              'images/ig.png',
+                              height: 18,
+                              width: 18,
+                            ),
+                            SizedBox(width: 10),
+                            Text(
+                              "@rumah_rental_camera_rrc",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 8,
                               ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 10),
-                      Row(
-                        children: [
-                          Image.asset(
-                            'images/ig.png',
-                            height: 20,
-                            width: 20,
-                          ),
-                          SizedBox(width: 5),
-                          Text(
-                            '@rumah_rental_camera_rrc',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 5,
-                              fontWeight: FontWeight.bold,
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                      SizedBox(height: 10),
-                      Row(
-                        children: [
-                          Image.asset(
-                            'images/fb.png',
-                            height: 20,
-                            width: 20,
-                          ),
-                          SizedBox(width: 5),
-                          Text(
-                            'rumah rental camera',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 5,
-                              fontWeight: FontWeight.bold,
+                      Container(
+                        width: MediaQuery.of(context).size.width * 0.5,
+                        child: Row(
+                          children: [
+                            Image.asset(
+                              'images/gmail.png',
+                              height: 18,
+                              width: 18,
                             ),
-                          ),
-                        ],
+                            SizedBox(width: 10),
+                            Text(
+                              "rumahrentalcamera4444@gmail.com",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 8,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        width: MediaQuery.of(context).size.width * 0.3,
+                        child: Row(
+                          children: [
+                            Image.asset(
+                              'images/fb.png',
+                              height: 18,
+                              width: 18,
+                            ),
+                            SizedBox(width: 10),
+                            Text(
+                              "Rental Cam Genteng",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 8,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        width: MediaQuery.of(context).size.width * 0.5,
+                        child: Row(
+                          children: [
+                            Image.asset(
+                              'images/location.png',
+                              height: 18,
+                              width: 18,
+                            ),
+                            SizedBox(width: 5),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Jl. Sumber Bening depan",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 8,
+                                  ),
+                                ),
+                                Text(
+                                  "Genteng Puskesmas Kembiritan",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 8,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
                 ],
               ),
-            ),
+            )
           ],
         ),
       ),
@@ -330,7 +376,8 @@ class DashboardPage extends StatelessWidget {
             SizedBox(height: 15),
             ElevatedButton(
               onPressed: () {},
-              style: ElevatedButton.styleFrom(primary: Color(0xfffde7e7)),
+              style: ElevatedButton.styleFrom(
+                  primary: Color.fromARGB(255, 248, 232, 232)),
               child: Text(
                 title,
                 style: TextStyle(color: Color(0xff0f0f0f)),
@@ -339,6 +386,72 @@ class DashboardPage extends StatelessWidget {
             SizedBox(height: 8),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class NotifikasiPage extends StatefulWidget {
+  @override
+  _NotifikasiPageState createState() => _NotifikasiPageState();
+}
+
+class _NotifikasiPageState extends State<NotifikasiPage> {
+  bool _isPengembalianExpanded = false;
+  bool _isUmumExpanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Notifikasi'),
+        backgroundColor:
+            Color.fromARGB(255, 16, 4, 3), // Ubah warna AppBar menjadi merah
+      ),
+      body: ListView(
+        children: [
+          ExpansionTile(
+            leading: Icon(
+                Icons.notification_important), // Tambahkan leading untuk ikon
+            title: Text('Notifikasi Pengembalian'),
+            children: [
+              ListTile(
+                title: Text('Notifikasi 1'),
+                subtitle: Text('Isi notifikasi 1'),
+              ),
+              ListTile(
+                title: Text('Notifikasi 2'),
+                subtitle: Text('Isi notifikasi 2'),
+              ),
+            ],
+            onExpansionChanged: (value) {
+              setState(() {
+                _isPengembalianExpanded = value;
+              });
+            },
+            initiallyExpanded: _isPengembalianExpanded,
+          ),
+          ExpansionTile(
+            leading: Icon(Icons.notifications), // Tambahkan leading untuk ikon
+            title: Text('Notifikasi Umum'),
+            children: [
+              ListTile(
+                title: Text('Notifikasi 1'),
+                subtitle: Text('Isi notifikasi 1'),
+              ),
+              ListTile(
+                title: Text('Notifikasi 2'),
+                subtitle: Text('Isi notifikasi 2'),
+              ),
+            ],
+            onExpansionChanged: (value) {
+              setState(() {
+                _isUmumExpanded = value;
+              });
+            },
+            initiallyExpanded: _isUmumExpanded,
+          ),
+        ],
       ),
     );
   }

@@ -1,48 +1,191 @@
+import 'package:belajar/Api/kamera.dart';
+import 'package:belajar/Api/paket.dart';
+import 'package:belajar/form_paket.dart';
+import 'package:belajar/helpers/api_url.dart';
+import 'package:belajar/model/camera.dart';
+import 'package:belajar/model/paket.dart';
 import 'package:flutter/material.dart';
-import 'form_penyewaan.dart';
+import 'form_camera.dart';
 
-class RentalPackageDetails {
-  String name;
-  String rentalDetails;
-  List<String> completeness;
-  String imageUrl;
-
-  RentalPackageDetails({
-    required this.name,
-    required this.rentalDetails,
-    required this.completeness,
-    required this.imageUrl,
-  });
+class PaketPage extends StatefulWidget {
+  @override
+  State<PaketPage> createState() => _PaketPageState();
 }
 
-class PackagePage extends StatelessWidget {
+class _PaketPageState extends State<PaketPage> {
+  final TextEditingController _searchController = TextEditingController();
+
+  List<Paket> paket = [];
+  List<Paket> filteredpaket = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchPaket();
+  }
+
+  Future<void> _fetchPaket() async {
+    try {
+      List<Paket> fetchedpaket = await PaketApi.getPaket();
+      setState(() {
+        paket = fetchedpaket;
+        filteredpaket = fetchedpaket;
+      });
+    } catch (error) {
+      print('Error fetching products: $error');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    RentalPackageDetails rentalPackage = RentalPackageDetails(
-      name: "Rental Package",
-      rentalDetails: "6 Jam : 200K\n12 Jam : 250K\n24 Jam : 300K",
-      completeness: [
-        "Stabilizer Moza Air Cros 2 Pro",
-        "Lensa Fix 35 MM F1.8 OSS",
-        "SDHC Sandisk 128GB Extrime Pro",
-        "Mirrorless Sony A6400",
-        "Lensa KIT 16-50 MM OSS",
-        "Baterai Tambahan Total 2 Unit + Charger",
-      ],
-      imageUrl:
-          "https://rentalalat.com/wp-content/uploads/2023/01/1.-Photographer-Fee.png",
-    );
-
-    return RentalPackageDetailsWidget(
-      rentalPackageDetails: rentalPackage,
+    // print(cameras);
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () {
+              // Add your back button functionality here
+              Navigator.pop(context);
+            },
+          ),
+          title: Container(
+            padding: EdgeInsets.symmetric(horizontal: 8),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: TextField(
+              onChanged: (value) {
+                setState(() {
+                  filteredpaket = paket
+                      .where((paket) => paket.namaAlat
+                          .toString()
+                          .toLowerCase()
+                          .contains(value.toLowerCase()))
+                      .toList();
+                });
+              },
+              controller: _searchController,
+              decoration: InputDecoration(
+                hintText: "Canon 650D",
+                border: InputBorder.none,
+                suffixIcon: Icon(Icons.search),
+              ),
+            ),
+          ),
+          backgroundColor: Color(0xff000000),
+        ),
+        body: Container(
+          decoration: BoxDecoration(
+            color: Color.fromARGB(255, 248, 232, 232),
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(15),
+              topRight: Radius.circular(15),
+            ),
+          ),
+          child: GridView.builder(
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+            ),
+            itemCount: filteredpaket.length,
+            itemBuilder: (BuildContext context, int index) {
+              return GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          PaketDetailsWidget(paket: filteredpaket[index]),
+                    ),
+                  );
+                },
+                child: PaketItem(paket: filteredpaket[index]),
+              );
+            },
+          ),
+        ),
+      ),
     );
   }
 }
 
-class RentalPackageDetailsWidget extends StatelessWidget {
-  final RentalPackageDetails rentalPackageDetails;
+class PaketItem extends StatelessWidget {
+  final Paket paket;
+  PaketItem({required this.paket});
 
-  RentalPackageDetailsWidget({required this.rentalPackageDetails});
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        color: Colors.white,
+      ),
+      child: Column(
+        mainAxisAlignment:
+            MainAxisAlignment.center, // Center content vertically
+        crossAxisAlignment:
+            CrossAxisAlignment.center, // Center content horizontally
+        children: [
+          Center(
+            child: Image.network(
+              '${ApiUrl.localhost}images/' + paket!.gambar.toString(),
+              width: 50,
+              height: 50,
+              fit: BoxFit.cover,
+            ),
+          ),
+          SizedBox(height: 4),
+          Center(
+            child: Text(
+              paket.namaAlat.toString(),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+          ),
+          SizedBox(height: 4),
+          Center(
+            child: Text('6 Jam: ${paket.harga6}',
+                style: TextStyle(
+                    fontSize: 12, color: Color.fromARGB(255, 13, 47, 75))),
+          ),
+          Center(
+            child: Text('12 Jam: ${paket.harga12}',
+                style: TextStyle(
+                    fontSize: 12, color: Color.fromARGB(255, 8, 63, 9))),
+          ),
+          Center(
+            child: Text('24 Jam: ${paket.harga24}',
+                style: TextStyle(
+                    fontSize: 12, color: Color.fromARGB(255, 65, 43, 11))),
+          ),
+          SizedBox(height: 4),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => PaketDetailsWidget(paket: paket),
+                ),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              primary: Color.fromARGB(0, 4, 0, 44),
+            ),
+            child: Text('Detail'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class PaketDetailsWidget extends StatelessWidget {
+  final Paket paket;
+
+  PaketDetailsWidget({required this.paket});
 
   @override
   Widget build(BuildContext context) {
@@ -54,7 +197,7 @@ class RentalPackageDetailsWidget extends StatelessWidget {
             Navigator.pop(context);
           },
         ),
-        title: Text(rentalPackageDetails.name),
+        title: Text(paket.namaAlat ?? ''),
         backgroundColor: Color(0xff000000),
       ),
       body: Padding(
@@ -65,25 +208,23 @@ class RentalPackageDetailsWidget extends StatelessWidget {
             Container(
               height: MediaQuery.of(context).size.height * 0.4,
               child: Image.network(
-                rentalPackageDetails.imageUrl,
+                '${ApiUrl.localhost}images/' + (paket.gambar?.toString() ?? ''),
                 width: MediaQuery.of(context).size.width,
                 fit: BoxFit.cover,
               ),
             ),
             SizedBox(height: 16),
-            Text(rentalPackageDetails.rentalDetails),
+            Text('Deskripsi : '),
             SizedBox(height: 16),
-            Text(
-              "Kelengkapan:",
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-            ),
+            Text(paket.deskripsi ?? 'Tidak Ada Deskripsi'),
+            SizedBox(height: 16),
+            Text('Harga : '),
+            SizedBox(height: 16),
+            Text('6 Jam: ${paket.harga6}'),
             SizedBox(height: 8),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: rentalPackageDetails.completeness
-                  .map((item) => Text("• $item"))
-                  .toList(),
-            ),
+            Text('12 Jam: ${paket.harga12}'),
+            SizedBox(height: 8),
+            Text('24 Jam: ${paket.harga24}'),
           ],
         ),
       ),
@@ -91,11 +232,10 @@ class RentalPackageDetailsWidget extends StatelessWidget {
         padding: const EdgeInsets.all(8.0),
         child: FloatingActionButton.extended(
           onPressed: () {
-            // Navigasi ke halaman FormPage
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => PersonalForm(),
+                builder: (context) => FormPaket(paket: paket),
               ),
             );
           },
@@ -105,7 +245,7 @@ class RentalPackageDetailsWidget extends StatelessWidget {
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      backgroundColor: Color(0xfffff4f4),
+      backgroundColor: Color.fromARGB(255, 248, 232, 232),
     );
   }
 }

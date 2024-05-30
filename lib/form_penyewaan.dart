@@ -1,225 +1,47 @@
-import 'package:belajar/model/aksesoris.dart';
 import 'package:flutter/material.dart';
-import 'reservasi.dart';
+import 'package:flutter/widgets.dart';
+import 'package:intl/intl.dart';
 
-class PersonalForm extends StatefulWidget {
-   Aksesoris accessoriesDetails  = Aksesoris();
-
-  PersonalForm({required this.accessoriesDetails});
+class FormPenyewaan extends StatefulWidget {
+  const FormPenyewaan({super.key});
 
   @override
-  _PersonalFormState createState() => _PersonalFormState();
+  State<FormPenyewaan> createState() => _FormPenyewaanState();
 }
 
-class _PersonalFormState extends State<PersonalForm> {
-
-  final _quantityController = TextEditingController();
-  final _dateController = TextEditingController();
-  DateTime? _pickupDate;
-  DateTime? _returnDate;
-  String _selectedPricePerHour = '6 Jam : 150K';
-  List<String> pricePerHourOptions = [
-    // '6 Jam : ${widget.accessoriesDetails.harga6.toString()}',
-    // '12 Jam : ${widget.accessoriesDetails.harga12.toString()}',
-    // '24 Jam : ${widget.accessoriesDetails.harga24.toString()}',
+class _FormPenyewaanState extends State<FormPenyewaan> {
+  TextEditingController durasiController = TextEditingController();
+  TextEditingController tanggalController = TextEditingController();
+  TextEditingController jumlahPembayaranController = TextEditingController();
+  TextEditingController methodePembayaranController = TextEditingController();
+  List<String> durasiSewa = [
+    '6 jam : 50.000',
+    '12 jam : 100.000',
+    '24 jam : 150.000',
   ];
+  String? selectedDurasi; // Initialize with first element
 
-  Duration _getDurationFromPricePerHour(String pricePerHour) {
-    switch (pricePerHour) {
-      case '6 Jam : 150K':
-        return Duration(hours: 6);
-      case '12 Jam : 180K':
-        return Duration(hours: 12);
-      case '24 Jam : 200K':
-        return Duration(hours: 24);
-      default:
-        return Duration(hours: 6);
-    }
-  }
-
-  void _showSubmittedData() {
-    final quantity = _quantityController.text;
-    final date = _dateController.text;
-
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text('Submitted Data'),
-          content: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('Price per Hour: $_selectedPricePerHour'),
-              Text('Quantity: $quantity'),
-              Text('Date: $date'),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Close'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => Second(
-                      pricePerHour: _selectedPricePerHour,
-                      date: date,
-                    ),
-                  ),
-                );
-              },
-              child: Text('View Details'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Widget _buildTextField(String hint, TextEditingController controller) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10.0),
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.black),
-          borderRadius: BorderRadius.circular(5.0),
-        ),
-        child: TextFormField(
-          decoration: InputDecoration(
-            border: InputBorder.none,
-            hintText: hint,
-          ),
-          controller: controller,
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return 'Please enter a value';
-            }
-            return null;
-          },
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDateTextField(String labelText, DateTime? selectedDate,
-      Function(DateTime?) onChanged, String pricePerHour) {
-    return Container(
-      margin: const EdgeInsets.all(8.0),
-      padding: const EdgeInsets.all(8.0),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.black),
-        borderRadius: BorderRadius.circular(8.0),
-      ),
-      child: ListTile(
-        title: Text(selectedDate == null
-            ? 'Select $labelText'
-            : '$labelText: ${selectedDate.toLocal().toString().split(' ')[0]} ${selectedDate.toLocal().hour}:${selectedDate.toLocal().minute.toString().padLeft(2, '0')}'),
-        trailing: Icon(Icons.calendar_today),
-        onTap: () async {
-          DateTime? pickedDate = await showDatePicker(
-            context: context,
-            initialDate: DateTime.now(),
-            firstDate: DateTime(2000),
-            lastDate: DateTime(2101),
-          );
-          if (pickedDate != null) {
-            TimeOfDay? pickedTime = await showTimePicker(
-              context: context,
-              initialTime: TimeOfDay.now(),
-            );
-            if (pickedTime != null) {
-              DateTime selectedDateTime = DateTime(
-                pickedDate.year,
-                pickedDate.month,
-                pickedDate.day,
-                pickedTime.hour,
-                pickedTime.minute,
-              );
-              onChanged(selectedDateTime);
-
-              // Update _dateController value when a date is picked
-              _dateController.text = selectedDateTime.toLocal().toString();
-
-              // Update _returnDate when pickup date is changed
-              setState(() {
-                _pickupDate = selectedDateTime;
-                _returnDate = _pickupDate!
-                    .add(_getDurationFromPricePerHour(pricePerHour));
-              });
-            }
-          }
-        },
-      ),
-    );
-  }
-
-  Widget _buildLabelLeftAligned(String label) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Container(
-        alignment: Alignment.centerLeft,
-        child: Text(
-          label,
-          style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPricePerHourDropdown() {
-    return Container(
-      margin: const EdgeInsets.all(8.0),
-      padding: const EdgeInsets.all(8.0),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.black),
-        borderRadius: BorderRadius.circular(8.0),
-      ),
-      child: ListTile(
-        title: Text('$_selectedPricePerHour', style: TextStyle(fontSize: 16)),
-        trailing: DropdownButton<String>(
-          value: _selectedPricePerHour,
-          onChanged: (String? value) {
-            setState(() {
-              _selectedPricePerHour = value!;
-              if (_pickupDate != null) {
-                _returnDate =
-                    _pickupDate!.add(_getDurationFromPricePerHour(value));
-              }
-            });
-          },
-          items: _pricePerHourOptions
-              .map<DropdownMenuItem<String>>((String value) {
-            return DropdownMenuItem<String>(
-              value: value,
-              child: Text(value),
-            );
-          }).toList(),
-        ),
-      ),
-    );
-  }
+  List<String> methodePembayaran = [
+    'Transfer',
+    'Cash',
+  ];
+  String? selectedMethodePembayaran; // Initialize with first element
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xffF3D4D4),
       appBar: AppBar(
         title: Text(
-          'Form penyewaan',
+          'Form Penyewaan',
           style: TextStyle(
-            color: Colors.white,
+            color: Color.fromARGB(255, 248, 232, 232),
           ),
         ),
+        centerTitle: true,
         backgroundColor: Color(0xff080808),
         leading: IconButton(
+          color: Colors.white,
           icon: Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pop(context);
@@ -227,39 +49,340 @@ class _PersonalFormState extends State<PersonalForm> {
         ),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            _buildLabelLeftAligned("Price per Hour"),
-            _buildPricePerHourDropdown(),
-            _buildLabelLeftAligned("Tanggal Pengambilan"),
-            _buildDateTextField("", _pickupDate, (pickedDate) {
-              setState(() {
-                _pickupDate = pickedDate;
-                if (_pickupDate != null) {
-                  _returnDate = _pickupDate!
-                      .add(_getDurationFromPricePerHour(_selectedPricePerHour));
-                }
-              });
-            }, _selectedPricePerHour),
-            _buildLabelLeftAligned("Tanggal Pengembalian"),
-            _buildDateTextField("", _returnDate, (pickedDate) {
-              setState(() {
-                _returnDate = pickedDate;
-              });
-            }, _selectedPricePerHour),
-            ElevatedButton.icon(
-              onPressed: () {
-                _showSubmittedData();
-              },
-              style: ElevatedButton.styleFrom(
-                primary: Color(0xff430f0c),
+        child: Padding(
+          padding: EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'isi formulir penyewaaan Camera Sony a5000',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
-              icon: Icon(Icons.shopping_cart),
-              label: Text('Sewa'),
-            ),
-          ],
+              SizedBox(
+                height: 16,
+              ),
+              Text(
+                'Pilih Durasi Sewa',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              SizedBox(
+                height: 8,
+              ),
+              DropdownDurasiSewa(),
+              SizedBox(
+                height: 16,
+              ),
+              Text(
+                'Pilih Tanggal Pengembalian',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              SizedBox(
+                height: 8,
+              ),
+              TanggalInput(),
+              SizedBox(
+                height: 16,
+              ),
+              JumlahPembayaran(),
+              SizedBox(
+                height: 16,
+              ),
+              Text(
+                'Pilih Methode Pembayaran',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              SizedBox(
+                height: 8,
+              ),
+              DropdownMethodePembayaran(),
+              SizedBox(
+                height: 16,
+              ),
+              informasiPembayaran(),
+              SizedBox(
+                height: 32,
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  minimumSize: Size(double.infinity, 48),
+                  backgroundColor: Color(0xff161515),
+                  // foregroundColor: Colors.white,
+                ),
+                onPressed: () {
+                  print(durasiController.text);
+                  print(jumlahPembayaranController.text);
+                  print(methodePembayaranController.text);
+                },
+                child: Text(
+                  'Sewa',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              )
+            ],
+          ),
         ),
+      ),
+    );
+  }
+
+  TextField JumlahPembayaran() {
+    return TextField(
+      controller: jumlahPembayaranController,
+      style: TextStyle(
+        color: Colors.green.shade400,
+      ),
+      decoration: InputDecoration(
+        fillColor: Colors.white,
+        hintText: "Jumlah Pembayaran",
+        filled: true,
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(width: 1, color: Colors.grey),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(width: 1, color: Colors.grey),
+        ),
+      ),
+      readOnly: true,
+    );
+  }
+
+  TextField TanggalInput() {
+    return TextField(
+      controller: tanggalController,
+      decoration: InputDecoration(
+        fillColor: Colors.white,
+        hintText: "Pilih Pengambilan Pada",
+        filled: true,
+        suffixIcon: Icon(Icons.calendar_month),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(width: 1, color: Colors.grey),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(width: 1, color: Colors.grey),
+        ),
+      ),
+      onTap: () {
+        _selectedDate();
+      },
+      readOnly: true,
+    );
+  }
+
+  Future<void> _selectedDate() async {
+    DateTime? _picked = await showDatePicker(
+      context: context,
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2100),
+      currentDate: DateTime.now(),
+      initialDate: DateTime.now(),
+    );
+    if (_picked != null) {
+      setState(() {
+        final formatter = DateFormat(
+            'dd MMMM yyyy', Intl.defaultLocale); // Set locale to Indonesian
+        tanggalController.text = formatter.format(_picked);
+      });
+    }
+  }
+
+  String? _getPriceFromDuration(String? duration) {
+    if (duration == null) return null;
+    final parts = duration.split(':');
+    if (parts.length != 2) return null;
+    final priceString = parts[1].trim();
+    return priceString;
+  }
+
+  Container DropdownDurasiSewa() {
+    return Container(
+      padding: EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: Colors.grey, width: 1),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: DropdownButton<String>(
+        underline: Container(color: Colors.transparent),
+        value: selectedDurasi,
+        isExpanded: true,
+        items: durasiSewa.map((String value) {
+          return DropdownMenuItem(
+            value: value,
+            child: Text(value),
+          );
+        }).toList(),
+        onChanged: (String? newValue) {
+          setState(() {
+            selectedDurasi = newValue!;
+            durasiController.text = newValue;
+            jumlahPembayaranController.text =
+                'Jumlah Pembayaran ${_getPriceFromDuration(newValue)!}';
+          });
+        },
+        hint: Text(
+          'Pilih Pengambilan Pada',
+        ), // Optional hint for initial state
+      ),
+    );
+  }
+
+  Container DropdownMethodePembayaran() {
+    return Container(
+      padding: EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: Colors.grey, width: 1),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: DropdownButton<String>(
+        underline: Container(color: Colors.transparent),
+        value: selectedMethodePembayaran,
+        isExpanded: true,
+        items: methodePembayaran.map((String value) {
+          return DropdownMenuItem(
+            value: value,
+            child: Text(value),
+          );
+        }).toList(),
+        onChanged: (String? newValue) {
+          setState(() {
+            selectedMethodePembayaran = newValue!;
+            methodePembayaranController.text = newValue;
+          });
+        },
+        hint: Text(
+          'Pilih Methode Pembayaran',
+        ), // Optional hint for initial state
+      ),
+    );
+  }
+
+  Container informasiPembayaran() {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.only(
+          bottomRight: Radius.circular(20),
+          bottomLeft: Radius.circular(20),
+        ),
+        color: Colors.white,
+        shape: BoxShape.rectangle,
+      ),
+      child: Column(
+        children: [
+          Container(
+            width: double.infinity,
+            color: Color(0xff9FC6DC),
+            child: Text(
+              'Informasi Pembayaran',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          SizedBox(
+            height: 12,
+          ),
+          Text(
+            'Silahkan melakukan pembayaran melalui rekening ini',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.green.shade400,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          SizedBox(
+            height: 16,
+          ),
+          Container(
+            padding: EdgeInsets.symmetric(vertical: 4),
+            width: MediaQuery.of(context).size.width * 3 / 5,
+            decoration: BoxDecoration(
+                color: Color(0xff352C2C),
+                borderRadius: BorderRadius.all(Radius.circular(8))),
+            child: Text(
+              'Bank BNI 0576854329087',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          SizedBox(
+            height: 12,
+          ),
+          Container(
+            padding: EdgeInsets.symmetric(vertical: 4),
+            width: MediaQuery.of(context).size.width * 3 / 5,
+            decoration: BoxDecoration(
+                color: Color(0xff352C2C),
+                borderRadius: BorderRadius.all(Radius.circular(8))),
+            child: Text(
+              'Bank BRI 0576854329087',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          SizedBox(
+            height: 16,
+          ),
+          GestureDetector(
+            onTap: () {},
+            child: Container(
+              padding: EdgeInsets.symmetric(vertical: 4),
+              width: MediaQuery.of(context).size.width * 2 / 4,
+              decoration: BoxDecoration(
+                  color: Color(0xffF83333),
+                  borderRadius: BorderRadius.all(Radius.circular(8))),
+              child: Text(
+                'Upload Bukti Pembayaran',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+          SizedBox(
+            height: 20,
+          ),
+        ],
       ),
     );
   }
