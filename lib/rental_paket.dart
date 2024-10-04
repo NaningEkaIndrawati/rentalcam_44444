@@ -214,9 +214,9 @@ class PaketDetailsWidget extends StatelessWidget {
               ),
             ),
             SizedBox(height: 16),
-            Text('Deskripsi : '),
+            Text('Deskripsi babi : '),
             SizedBox(height: 16),
-            Text(paket.deskripsi ?? 'Tidak Ada Deskripsi'),
+            Text(paket.deskripsi ?? 'Tidak Ada Deskripsi pepek'),
             SizedBox(height: 16),
             Text('Harga : '),
             SizedBox(height: 16),
@@ -228,6 +228,7 @@ class PaketDetailsWidget extends StatelessWidget {
           ],
         ),
       ),
+  
       floatingActionButton: Padding(
         padding: const EdgeInsets.all(8.0),
         child: FloatingActionButton.extended(
@@ -239,7 +240,7 @@ class PaketDetailsWidget extends StatelessWidget {
               ),
             );
           },
-          label: Text('Sewa Langsung'),
+          label: Text('Sewa Langsung cuy'),
           icon: Icon(Icons.shopping_cart),
           backgroundColor: Color(0xff000000),
         ),

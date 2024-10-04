@@ -1,0 +1,1 @@
+const String appidOneSignal = "6a7e367b-b2c1-4617-bc23-7c48f1ca449a";

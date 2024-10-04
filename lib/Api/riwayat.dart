@@ -8,8 +8,9 @@ import 'package:http/http.dart' as http;
 class RiwayatApi {
   static Future<List<Riwayat>> getRiwayat() async {
     String apiurl = ApiUrl.riwayat;
+    
     var token = await UserInfo().getToken();
-
+  
     try {
       final response = await http.get(
         Uri.parse(apiurl),
@@ -37,5 +38,6 @@ class RiwayatApi {
       print('Error: $error');
       throw Exception('Failed to fetch data: $error');
     }
+    
   }
 }

@@ -397,61 +397,55 @@ class NotifikasiPage extends StatefulWidget {
 }
 
 class _NotifikasiPageState extends State<NotifikasiPage> {
-  bool _isPengembalianExpanded = false;
-  bool _isUmumExpanded = false;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Notifikasi'),
-        backgroundColor:
-            Color.fromARGB(255, 16, 4, 3), // Ubah warna AppBar menjadi merah
+        backgroundColor: Color.fromARGB(255, 16, 4, 3), // Warna AppBar
       ),
       body: ListView(
+        padding: EdgeInsets.all(8.0),
         children: [
-          ExpansionTile(
-            leading: Icon(
-                Icons.notification_important), // Tambahkan leading untuk ikon
-            title: Text('Notifikasi Pengembalian'),
-            children: [
-              ListTile(
-                title: Text('Notifikasi 1'),
-                subtitle: Text('Isi notifikasi 1'),
-              ),
-              ListTile(
-                title: Text('Notifikasi 2'),
-                subtitle: Text('Isi notifikasi 2'),
-              ),
-            ],
-            onExpansionChanged: (value) {
-              setState(() {
-                _isPengembalianExpanded = value;
-              });
-            },
-            initiallyExpanded: _isPengembalianExpanded,
+          _buildNotificationCard(
+            icon: Icons.warning_amber_rounded,
+            title: 'Keterlambatan',
+            content: 'Anda memiliki keterlambatan pengembalian alat.',
           ),
-          ExpansionTile(
-            leading: Icon(Icons.notifications), // Tambahkan leading untuk ikon
-            title: Text('Notifikasi Umum'),
-            children: [
-              ListTile(
-                title: Text('Notifikasi 1'),
-                subtitle: Text('Isi notifikasi 1'),
-              ),
-              ListTile(
-                title: Text('Notifikasi 2'),
-                subtitle: Text('Isi notifikasi 2'),
-              ),
-            ],
-            onExpansionChanged: (value) {
-              setState(() {
-                _isUmumExpanded = value;
-              });
-            },
-            initiallyExpanded: _isUmumExpanded,
+          _buildNotificationCard(
+            icon: Icons.check_circle_outline,
+            title: 'Pengembalian Berhasil',
+            content: 'Anda telah mengembalikan alat dengan sukses.',
           ),
+          _buildNotificationCard(
+            icon: Icons.warning_amber_rounded,
+            title: 'Keterlambatan',
+            content: 'Anda memiliki keterlambatan pengembalian alat.',
+          ),
+          _buildNotificationCard(
+            icon: Icons.check_circle_outline,
+            title: 'Pengembalian Berhasil',
+            content: 'Anda telah mengembalikan alat dengan sukses.',
+          ),
+          // Add more notifications as needed
         ],
+      ),
+    );
+  }
+
+  // Widget to build individual notification cards
+  Widget _buildNotificationCard(
+      {required IconData icon, required String title, required String content}) {
+    return Card(
+      margin: EdgeInsets.symmetric(vertical: 8.0),
+      child: ListTile(
+        leading: Icon(icon, color: Colors.red), // Custom icon and color
+        title: Text(title),
+        subtitle: Text(content),
+        trailing: Icon(Icons.arrow_forward_ios), // Optional trailing icon
+        onTap: () {
+          // Add action when the notification is tapped if needed
+        },
       ),
     );
   }

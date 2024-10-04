@@ -177,6 +177,8 @@ class Alat {
   String? gambar;
   String? createdAt;
   String? updatedAt;
+  String? status;
+
 
   Alat(
       {this.id,
@@ -188,7 +190,10 @@ class Alat {
       this.harga6,
       this.gambar,
       this.createdAt,
-      this.updatedAt});
+      this.updatedAt,
+      this.status
+      }
+      );
 
   Alat.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -201,6 +206,7 @@ class Alat {
     gambar = json['gambar'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
+    status = json['status'];
   }
 
   Map<String, dynamic> toJson() {
