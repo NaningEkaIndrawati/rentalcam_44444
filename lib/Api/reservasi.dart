@@ -1,11 +1,13 @@
 import 'dart:convert';
+import 'dart:io';
 
-import 'package:belajar/dashboard.dart';
 import 'package:belajar/helpers/api_url.dart';
 import 'package:belajar/helpers/user_info.dart';
 import 'package:belajar/reservasi.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:path/path.dart';
+import 'package:async/async.dart';
 
 class ReservasiApi {
   static void createReservasi(
@@ -13,8 +15,11 @@ class ReservasiApi {
       String? waktuSewa,
       String? startDate,
       String? startTime,
+      String? metodePembayaran,
+      File? imageFile,
       BuildContext? context}) async {
     String apiurl = ApiUrl.reservasi;
+
     var token = await UserInfo().getToken();
 
     // print("id alat : $idAlat");
@@ -24,22 +29,27 @@ class ReservasiApi {
     // return;
 
     try {
-      var body = {
-        "id_alat": idAlat,
-        "waktu_sewa": waktuSewa,
-        "start_date": startDate.toString(),
-        "start_time": startTime,
-      };
+     var request = http.MultipartRequest('POST', Uri.parse(apiurl))
+      ..headers['Authorization'] = 'Bearer $token'
+      ..fields['id_alat'] = idAlat!
+      ..fields['waktu_sewa'] = waktuSewa!
+      ..fields['metode_pembayaran'] = metodePembayaran!
+      ..fields['start_date'] = startDate!
+      ..fields['start_time'] = startTime!;
 
-      var response = await http.post(Uri.parse(apiurl),
-          headers: {
-            'Accept': 'application/json',
-            'Authorization': 'Bearer $token',
-          },
-          body: body);
+    if (imageFile != null) {
+      var stream = http.ByteStream(DelegatingStream.typed(imageFile.openRead()));
+      var length = await imageFile.length();
+      var multipartFile = http.MultipartFile('bukti_upload', stream, length,
+          filename: basename(imageFile.path));
+      request.files.add(multipartFile);
+    }
+
+    var response = await request.send();
 
       if (response.statusCode == 200) {
-        var jsonObj = json.decode(response.body);
+       var responseData = await http.Response.fromStream(response);
+      var jsonObj = json.decode(responseData.body);
 
         Navigator.pushReplacement(
             context!, MaterialPageRoute(builder: (context) => Second()));
@@ -52,7 +62,8 @@ class ReservasiApi {
           ),
         );
       } else {
-        var jsonObj = json.decode(response.body);
+       var responseData = await http.Response.fromStream(response);
+      var jsonObj = json.decode(responseData.body);
         ScaffoldMessenger.of(context!).showSnackBar(
           SnackBar(
             backgroundColor: Colors.red,

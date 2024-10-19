@@ -1,3 +1,4 @@
+import 'package:belajar/katalog_camera.dart';
 import 'package:flutter/material.dart';
 import 'package:belajar/Api/riwayat.dart';
 import 'package:belajar/helpers/api_url.dart';
@@ -8,7 +9,15 @@ class Second extends StatefulWidget {
   State<Second> createState() => _SecondState();
 }
 
-class _SecondState extends State<Second> {
+class _SecondState extends State<Second> with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 3, vsync: this);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,8 +33,16 @@ class _SecondState extends State<Second> {
             Navigator.pop(context);
           },
         ),
+        bottom: TabBar(
+          controller: _tabController,
+          tabs: [
+            Tab(icon: Icon(Icons.warning), text: "Denda"),
+            Tab(icon: Icon(Icons.shopping_cart), text: "Penyewaan"),
+            Tab(icon: Icon(Icons.check_circle), text: "Selesai"),
+          ],
+        ),
       ),
-      body: FutureBuilder(
+      body: FutureBuilder<List<Riwayat>>(
         future: RiwayatApi.getRiwayat(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -34,53 +51,13 @@ class _SecondState extends State<Second> {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else {
             List<Riwayat> riwayat = snapshot.data!;
-
-            return ListView.separated(
-              padding: EdgeInsets.all(16.0),
-              itemCount: riwayat.length,
-              separatorBuilder: (BuildContext context, int index) =>
-                  SizedBox(height: 16.0),
-              itemBuilder: (context, index) {
-                if (index == 0) {
-                  // Tampilkan judul hanya di atas kotak pertama
-                  if (riwayat[index].status.toString() == "1") {
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Transaksi Sedang Disewa:',
-                          style: TextStyle(
-                            fontSize: 20.0,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.red,
-                          ),
-                        ),
-                        SizedBox(height: 8.0),
-                        buildTransactionWidget(riwayat[index]),
-                      ],
-                    );
-                  } else {
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Transaksi Sudah Dikembalikan:',
-                          style: TextStyle(
-                            fontSize: 20.0,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.green,
-                          ),
-                        ),
-                        SizedBox(height: 8.0),
-                        buildTransactionWidget(riwayat[index]),
-                      ],
-                    );
-                  }
-                } else {
-                  // Jika bukan kotak pertama, tidak perlu menampilkan judul lagi
-                  return buildTransactionWidget(riwayat[index]);
-                }
-              },
+            return TabBarView(
+              controller: _tabController,
+              children: [
+                _buildDendaTab(),
+                _buildPenyewaanTab(riwayat),
+                _buildSelesaiTab(riwayat),
+              ],
             );
           }
         },
@@ -88,129 +65,279 @@ class _SecondState extends State<Second> {
     );
   }
 
-  Widget buildTransactionWidget(Riwayat riwayat) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => DetailPage(
-              riwayat: riwayat,
-            ),
-          ),
-        );
+  // Tab for displaying fines (denda)
+  Widget _buildDendaTab() {
+    return FutureBuilder<List<Riwayat>>(
+      future: RiwayatApi.getRiwayat(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        } else {
+          List<Riwayat> riwayat = snapshot.data!;
+          List<Riwayat> denda = riwayat.where((item) => _isOverdue(item)).toList();
+          return _buildFineList(denda);
+        }
       },
-      child: Container(
-        padding: EdgeInsets.all(12.0),
-        margin: EdgeInsets.only(bottom: 12.0),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10.0),
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.5),
-              spreadRadius: 2,
-              blurRadius: 5,
-              offset: Offset(0, 3),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Nama alat',
-                  style: TextStyle(
-                    fontSize: 18.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(width: 8.0), // Spacer
-              ],
-            ),
-            SizedBox(height: 8.0),
-            Text(
-              '${riwayat.orderApi!.alat!.namaAlat ?? ""}',
-              style: TextStyle(
-                fontSize: 19,
-                color: Color.fromARGB(255, 12, 73, 106),
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 16.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Nama Penyewa',
-                  style: TextStyle(
-                    fontSize: 18.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 8.0),
-            Text(
-              '${riwayat.penyewa!.nama ?? ""}',
-              style: TextStyle(
-                fontSize: 19,
-                color: Color.fromARGB(255, 12, 73, 106),
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 16.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Date',
-                  style: TextStyle(
-                    fontSize: 18.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 8.0),
-            Text(
-              "${riwayat.orderApi!.starts ?? ""}",
-              style: TextStyle(
-                fontSize: 16.0,
-                color: Color.fromARGB(255, 53, 101, 140),
-              ),
-            ),
-            SizedBox(height: 16.0),
-            Row(
-              children: [
-                if (riwayat.status.toString() == "1") ...[
-                  Spacer(),
-                  DetailButton(
-                    title: 'Perpanjang Sewa',
-                    onPressed: () {
-                      // Implement perpanjangan sewa
-                    },
-                  ),
-                ],
-                Spacer(),
-                if (riwayat.status.toString() != "1") ...[
-                  DetailButton(
-                    title: 'Sewa Lagi',
-                    onPressed: () {
-                      // Implement sewa lagi
-                    },
-                  ),
-                ],
-              ],
-            ),
-          ],
-        ),
-      ),
     );
   }
+
+  // Check if the transaction is overdue
+  bool _isOverdue(Riwayat riwayat) {
+    DateTime endTime = DateTime.parse(riwayat.orderApi!.ends!); // End time of the rental
+    DateTime currentTime = DateTime.now();
+    return currentTime.isAfter(endTime); // Returns true if overdue
+  }
+
+  // Build the list of fines
+  Widget _buildFineList(List<Riwayat> overdueTransactions) {
+  if (overdueTransactions.isEmpty) {
+    return Center(child: Text("No fines yet."));
+  } else {
+    return ListView.builder(
+      padding: EdgeInsets.all(16.0),
+      itemCount: overdueTransactions.length,
+      itemBuilder: (context, index) {
+        Riwayat riwayat = overdueTransactions[index];
+        double fineAmount = _calculateFine(riwayat); // Calculate the fine amount
+        return _buildFineCard(riwayat, fineAmount);
+      },
+    );
+  }
+}
+
+Widget _buildFineCard(Riwayat riwayat, double fineAmount) {
+  return Container(
+    margin: EdgeInsets.only(bottom: 16.0),
+    padding: EdgeInsets.all(16.0),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(12.0),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.grey.withOpacity(0.2),
+          spreadRadius: 1,
+          blurRadius: 5,
+          offset: Offset(0, 3),
+        ),
+      ],
+    ),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(8.0),
+          child: Image.network(
+            '${ApiUrl.localhost}images/' + riwayat.orderApi!.alat!.gambar.toString(),
+            width: 80,
+            height: 80,
+            fit: BoxFit.cover,
+          ),
+        ),
+        SizedBox(width: 16.0),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                riwayat.orderApi!.alat!.namaAlat ?? 'Unknown Equipment',
+                style: TextStyle(
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+              SizedBox(height: 8.0),
+              Text(
+                riwayat.orderApi!.alat!.namaAlat ?? 'Equipment ID',
+                style: TextStyle(
+                  fontSize: 14.0,
+                  color: Colors.grey,
+                ),
+              ),
+              SizedBox(height: 8.0),
+              Text(
+                'Denda',
+                style: TextStyle(
+                  fontSize: 14.0,
+                  color: Colors.red,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ),
+        Text(
+          'Rp.${fineAmount.toStringAsFixed(0)}',
+          style: TextStyle(
+            fontSize: 16.0,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+  // Calculate the fine based on the overdue time
+  double _calculateFine(Riwayat riwayat) {
+    DateTime endTime = DateTime.parse(riwayat.orderApi!.ends!);
+    DateTime currentTime = DateTime.now();
+    Duration overdueDuration = currentTime.difference(endTime);
+    
+    // Example: Fine is Rp. 5000 per hour overdue
+    double finePerHour = 5000.0;
+    int overdueHours = overdueDuration.inHours;
+    
+    return overdueHours * finePerHour;
+  }
+}
+
+  Widget _buildPenyewaanTab(List<Riwayat> riwayat) {
+    List<Riwayat> penyewaan = riwayat.where((item) => item.status == 1).toList();
+    return _buildTransactionList(penyewaan);
+  }
+
+  Widget _buildSelesaiTab(List<Riwayat> riwayat) {
+    List<Riwayat> selesai = riwayat.where((item) => item.status != 1).toList();
+    return _buildTransactionList(selesai, showRatingAndReview: true);
+  }
+
+ Widget _buildTransactionList(List<Riwayat> transactions, {bool showRatingAndReview = false}) {
+  if (transactions.isEmpty) {
+    return Center(child: Text("No transactions found."));
+  } else {
+    return ListView.builder(
+      padding: EdgeInsets.all(16.0),
+      itemCount: transactions.length,
+      itemBuilder: (context, index) {
+        return _buildTransactionCard(transactions[index], context, showRatingAndReview);
+      },
+    );
+  }
+}
+
+Widget _buildTransactionCard(Riwayat riwayat, BuildContext context, bool showRatingAndReview) {
+  return Container(
+    margin: EdgeInsets.only(bottom: 16.0),
+    padding: EdgeInsets.all(16.0),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(12.0),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.grey.withOpacity(0.2),
+          spreadRadius: 1,
+          blurRadius: 5,
+          offset: Offset(0, 3),
+        ),
+      ],
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8.0),
+              child: Image.network(
+                '${ApiUrl.localhost}images/' + riwayat.orderApi!.alat!.gambar.toString(),
+                width: 80,
+                height: 80,
+                fit: BoxFit.cover,
+              ),
+            ),
+            SizedBox(width: 16.0),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    riwayat.orderApi!.alat!.namaAlat ?? 'Unknown Equipment',
+                    style: TextStyle(
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                  SizedBox(height: 8.0),
+                  Text(
+                    riwayat.penyewa?.nama ?? 'Penyewa Unknown',
+                    style: TextStyle(
+                      fontSize: 14.0,
+                      color: Colors.grey,
+                    ),
+                  ),
+                  SizedBox(height: 8.0),
+                  Text(
+                    riwayat.status == 1 ? 'Sedang Disewa' : 'Sudah Selesai',
+                    style: TextStyle(
+                      fontSize: 14.0,
+                      color: riwayat.status == 1 ? Colors.orange : Colors.green,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 16.0),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            if (riwayat.status == 1) // Show only for ongoing rentals
+              ElevatedButton.icon(
+                icon: Icon(Icons.access_time),
+                label: Text('Perpanjang Sewa'),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CameraDetailsWidget(
+                        cameraDetails: riwayat.orderApi!.alat!,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            SizedBox(width: 8.0),
+            ElevatedButton.icon(
+              icon: Icon(Icons.info),
+              label: Text('Detail'),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => DetailPage(riwayat: riwayat),
+                  ),
+                );
+              },
+            ),
+            if (riwayat.status != 1) // Show only for completed rentals
+              SizedBox(width: 8.0),
+            if (riwayat.status != 1)
+              ElevatedButton.icon(
+                icon: Icon(Icons.shopping_cart),
+                label: Text('Sewa Lagi'),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CameraDetailsWidget(
+                        cameraDetails: riwayat.orderApi!.alat!,
+                      ),
+                    ),
+                  );
+                },
+              ),
+          ],
+        ),
+      ],
+    ),
+  );
 }
 
 class DetailButton extends StatelessWidget {
@@ -325,9 +452,8 @@ class DetailItem extends StatelessWidget {
         Text(
           value,
           style: TextStyle(
-            fontSize: 15.0,
-            color: Color.fromARGB(255, 12, 73, 106),
-            fontWeight: FontWeight.bold,
+            fontSize: 16.0,
+            color: Colors.black,
           ),
         ),
       ],

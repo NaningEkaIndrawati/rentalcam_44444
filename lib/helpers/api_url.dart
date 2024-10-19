@@ -10,6 +10,7 @@ class ApiUrl {
   static const String accessories = baseUrl + '/accessories';
   static const String reservasi = baseUrl + '/reservasi';
   static const String riwayat = baseUrl + '/riwayat';
+  static const String notifikasi = baseUrl + '/notifikasi';
   // static const String listProduk = baseUrl + '/produk';
   // static const String createProduk = baseUrl + '/produk';
 }

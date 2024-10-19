@@ -67,7 +67,7 @@ class _CameraPageState extends State<CameraPage> {
               },
               controller: _searchController,
               decoration: InputDecoration(
-                hintText: "Canon 650D",
+                hintText: "Canon 650D tes",
                 border: InputBorder.none,
                 suffixIcon: Icon(Icons.search),
               ),
@@ -196,7 +196,7 @@ class CameraItem extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
-                  'Tersedia 1',
+                  '${camera!.status}',
                   style: TextStyle(
                     color: Colors.white,
                   ),
@@ -211,8 +211,7 @@ class CameraItem extends StatelessWidget {
 }
 
 class CameraDetailsWidget extends StatelessWidget {
-  final Kamera cameraDetails;
-
+   var cameraDetails;
   CameraDetailsWidget({required this.cameraDetails});
 
   @override
@@ -257,22 +256,24 @@ class CameraDetailsWidget extends StatelessWidget {
           ],
         ),
       ),
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: FloatingActionButton.extended(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => FormCamera(kamera: cameraDetails),
+      floatingActionButton: cameraDetails.status == 'tersedia'
+          ? Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: FloatingActionButton.extended(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => FormCamera(kamera: cameraDetails),
+                    ),
+                  );
+                },
+                label: Text('Sewa Langsung cuy'),
+                icon: Icon(Icons.shopping_cart),
+                backgroundColor: Color(0xff000000),
               ),
-            );
-          },
-          label: Text('Sewa Langsung'),
-          icon: Icon(Icons.shopping_cart),
-          backgroundColor: Color(0xff000000),
-        ),
-      ),
+            )
+          : null,
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       backgroundColor: Color.fromARGB(255, 248, 232, 232),
     );

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:belajar/dashboard.dart';
 import 'package:belajar/helpers/api_url.dart';
+import 'package:belajar/helpers/onesignal.dart';
 import 'package:belajar/helpers/user_info.dart';
 import 'package:belajar/login.dart';
 import 'package:flutter/material.dart';
@@ -19,7 +20,7 @@ class AuthApi {
       if (response.statusCode == 200) {
         var jsonObj = json.decode(response.body);
         UserInfo().setToken(jsonObj['token']);
-
+        OneSignalHelper().setOneSignalByUserID(jsonObj['user']['id']);
         Navigator.pushReplacement(
           context!,
           MaterialPageRoute(builder: (context) => DashboardPage()),

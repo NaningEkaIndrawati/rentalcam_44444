@@ -6,7 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 
 class FormCamera extends StatefulWidget {
-  final Kamera kamera;
+  var kamera;
 
   FormCamera({required this.kamera});
 
@@ -17,7 +17,7 @@ class FormCamera extends StatefulWidget {
 class _FormCameraState extends State<FormCamera> {
   final _dateController = TextEditingController();
   final _timeController = TextEditingController();
-  late Kamera kamera;
+  late var kamera;
   DateTime? _pickupDate;
   int _selectedPricePerHour = 0;
   List<String> pricePerHourOptions = [];
@@ -111,6 +111,7 @@ class _FormCameraState extends State<FormCamera> {
   }
 
   Widget _buildLabelLeftAligned(String label) {
+    print(kamera.namaAlat);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Container(
@@ -263,6 +264,8 @@ class _FormCameraState extends State<FormCamera> {
                     startDate: startDate,
                     startTime: startTime,
                     waktuSewa: waktuSewa.toString(),
+                    imageFile: _imageFile,
+                    metodePembayaran: selectedMethodePembayaran,
                     context: context);
               },
               child: Text(

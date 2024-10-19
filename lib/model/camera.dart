@@ -10,6 +10,7 @@ class Kamera {
   final String? createdAt;
   final String? updatedAt;
   final String category;
+  final String status;
 
   Kamera({
     required this.id,
@@ -23,6 +24,7 @@ class Kamera {
     this.createdAt,
     this.updatedAt,
     required this.category,
+    required this.status,
   });
 
   factory Kamera.fromJson(Map<String, dynamic> json) {
@@ -38,6 +40,7 @@ class Kamera {
       createdAt: json['created_at'],
       updatedAt: json['updated_at'],
       category: json['category']['nama_kategori'],
+      status: json['status'],
     );
   }
 }
